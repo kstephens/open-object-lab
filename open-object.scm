@@ -1,8 +1,9 @@
-#lang r5rs
+#!r6rs
 ;;; Piumarta and Warth's Open Objects in Scheme.
+(library (open-object)
+          (export <vtable> <object> send)
+        (import (rnrs) (rnrs mutable-pairs (6)))
 (define object:tag '(OBJECT))
-(define <vtable>   #f)
-(define <object>   #f)
 
 (define (object:_vt  self)
   (vector-ref  self 1))
@@ -14,16 +15,6 @@
     (vector-set! obj 0 object:tag)
     (object:_vt= obj self)
     obj))
- 
-(define (object? self)
-  (and (vector? self)
-       (>= (vector-length self) 2)
-       (eq? (vector-ref self 0) object:tag)))
- 
-(define (vtable self)
-  (cond
-    ((object? self)   (object:_vt self))
-    (else             <object>)))
  
 (define (vtable:parent  self)
   (vector-ref  self 2))
@@ -44,6 +35,9 @@
 
 (define (vtable:delegated self)
   (vtable:with-parent self #f))
+ 
+(define <vtable> (vtable:delegated #f))
+(define <object> (vtable:delegated #f))
  
 (define (vtable:add-method self key value)
   (let* ( (methods (vtable:methods self))
@@ -67,13 +61,19 @@
 (define (send op self . args)
   (apply (bind op self) self args))
  
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define (object? self)
+  (and (vector? self)
+       (>= (vector-length self) 2)
+       (eq? (vector-ref self 0) object:tag)))
+ 
+(define (vtable self)
+  (cond
+    ((object? self)   (object:_vt self))
+    (else             <object>)))
+ 
 ;; Bootstrap vtables:
- 
-(set! <vtable> (vtable:delegated #f))
+(begin
 (object:_vt= <vtable> <vtable>)
- 
-(set! <object> (vtable:delegated #f))
 (object:_vt= <object> <vtable>)
  
 (vtable:parent= <vtable> <object>)
@@ -84,7 +84,7 @@
 (send 'add-method <vtable> 'alloc vtable:alloc)
 (send 'add-method <vtable> 'delegated vtable:delegated)
  
-;;; Additional vtables methods:
+;; Additional vtable methods:
 (send 'add-method <vtable> 'with-parent vtable:with-parent)
 
 (send 'add-method <vtable> 'add-offset-accessor
@@ -94,4 +94,5 @@
               (lambda (self)       (vector-ref  self offset)))
         (send 'add-method self (string->symbol (string-append (symbol->string name) "="))
               (lambda (self value) (vector-set! self offset value)))))
-
+)
+)
