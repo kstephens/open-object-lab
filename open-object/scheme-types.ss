@@ -21,7 +21,7 @@
 
 (begin
 ;; Extend vtable determination into Scheme types:
-(set-vtable! (lambda (self)
+(set-vtable-proc! (lambda (self)
   (cond
     ((integer? self)  <integer>)
     ((rational? self) <rational>)
