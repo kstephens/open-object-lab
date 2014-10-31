@@ -1,6 +1,11 @@
-#lang r5rs
+#!r6rs
 ;; Additional vtables for Scheme types:
-
+(library (open-object scheme-types)
+  (export
+    <number> <complex> <real> <rational> <integer>
+    <symbol>
+    <sequence> <list> <pair> <null> <vector>)
+  (import (open-object) (rnrs))
 
 (define <number>  (send 'with-parent <vtable> <object>))
 (define <complex> (send 'with-parent <vtable> <number>))
@@ -14,8 +19,9 @@
 (define <null>     (send 'with-parent <vtable> <list>))
 (define <vector>   (send 'with-parent <vtable> <sequence>))
 
+(begin
 ;; Extend vtable determination into Scheme types:
-(set! vtable (lambda (self)
+(set-vtable! (lambda (self)
   (cond
     ((integer? self)  <integer>)
     ((rational? self) <rational>)
@@ -28,4 +34,4 @@
     ((null?    self)  <null>)
     ((vector?  self)  <vector>)
     (else             <object>))))
- 
+))

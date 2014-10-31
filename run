@@ -1,0 +1,5 @@
+#!/bin/sh
+RACKET_DIR="${RACKET_DIR:-$(ls -d /Applications/Racket*/ | tail -1)}"
+export PLTCOLLECTS="$(/bin/pwd):"
+PATH="$RACKET_DIR/bin:$PATH"
+exec plt-r6rs "$@"

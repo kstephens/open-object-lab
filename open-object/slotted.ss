@@ -1,3 +1,5 @@
+#lang r5rs
+(load "open-object.scm")
 (define <slotted-vtable> (send 'alloc <vtable> 4))
 (send 'parent= <slotted-vtable> <vtable>)
 (send 'methods= <slotted-vtable> '())

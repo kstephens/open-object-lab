@@ -1,7 +1,7 @@
 #!r6rs
 ;;; Piumarta and Warth's Open Objects in Scheme.
 (library (open-object)
-          (export <vtable> <object> send)
+          (export <vtable> <object> set-vtable! send object? object:_vt)
         (import (rnrs) (rnrs mutable-pairs (6)))
 (define object:tag '(OBJECT))
 
@@ -65,11 +65,18 @@
   (and (vector? self)
        (>= (vector-length self) 2)
        (eq? (vector-ref self 0) object:tag)))
- 
+
+(define vtable-proc
+  (lambda (self)
+    (cond
+      ((object? self)   (object:_vt self))
+      (else             <object>))))
+
+(define (set-vtable! proc)
+  (set! vtable-proc proc))
+
 (define (vtable self)
-  (cond
-    ((object? self)   (object:_vt self))
-    (else             <object>)))
+  (vtable-proc self))
  
 ;; Bootstrap vtables:
 (begin
