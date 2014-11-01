@@ -20,6 +20,10 @@
 (define <vector>   (send 'with-parent <vtable> <sequence>))
 
 (begin
+  (send 'name= <number> 'number)
+  (send 'name= <complex> 'complex)
+  (send 'name= <real> 'real)
+
 ;; Extend vtable determination into Scheme types:
 (set-vtable-proc! (lambda (self)
   (cond
@@ -29,9 +33,9 @@
     ((complex? self)  <complex>)
     ((number?  self)  <number>)
     ((symbol?  self)  <symbol>)
-    ((object?  self)  (object:_vt self))
     ((pair?    self)  <pair>)
     ((null?    self)  <null>)
+    ((object?  self)  (object:_vt self))
     ((vector?  self)  <vector>)
     (else             <object>))))
 ))

@@ -19,7 +19,7 @@
   (send 'add-method <object>
         'print (lambda (self) (write `(object ,self)) (newline)))
   (send 'add-method <vtable>
-        'print (lambda (self) (write `(vtable ...)) (newline)))
+        'print (lambda (self) (write `(vtable ,(send 'name self))) (newline)))
   (send 'add-method <number>
         'print (lambda (self) (write `(number ,self)) (newline)))
   (send 'add-method <real>
