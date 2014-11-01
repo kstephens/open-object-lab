@@ -12,11 +12,9 @@
 
   (define (slotted-demo)
     (display "  :: slotted-demo ::")(newline)
-    ;; (set-send-trace! #t)
     (let* (
             (cls (send 'new-class <slotted-metaclass> 'cls <slotted-object> '(a b c)))
             (obj (send 'new cls)))
-      ;; (set-send-trace! #f)
       (send 'a= obj 1)
       (send 'c= obj 3)
       (send 'write obj)(newline)
@@ -27,8 +25,6 @@
     (send 'name= <slotted-class> 'slotted-class)
     (send 'name= <slotted-object> 'slotted-object)
 
-    ;; (set-send-trace! #t)
-    (send 'add-offset-accessor <slotted-object> '_slots 0)
     (send 'add-offset-accessor <slotted-metaclass> 'slots 4)
     (send 'add-offset-accessor <slotted-metaclass> 'slots-size 5)
     (send 'add-offset-accessor <slotted-metaclass> 'slot-i-map 6)

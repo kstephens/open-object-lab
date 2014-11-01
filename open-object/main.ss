@@ -131,6 +131,7 @@
         (send 'add-method self (string->symbol (string-append (symbol->string name) "="))
               (lambda (self value) (vector-set! self offset value)))))
 
+(send 'add-method <object> 'vtable vtable)
 (send 'add-offset-accessor <object> '_vt -1)
 (send 'add-offset-accessor <vtable> 'parent 0)
 (send 'add-offset-accessor <vtable> 'methods 1)

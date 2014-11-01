@@ -7,13 +7,15 @@
            (rnrs))
 
 (define (print-demo)
+  (display "  :: print-demo ::")(newline)
   (send 'print <vtable>)
   (send 'print <object>)
   (send 'print 'a-symbol)
   (send 'print 123)
   (send 'print 1234.56)
   (send 'print 1/23)
-  (send 'print '(a cons)))
+  (send 'print '(a cons))
+  (newline))
 
 (begin
   (send 'add-method <object>
