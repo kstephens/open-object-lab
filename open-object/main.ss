@@ -58,14 +58,14 @@
   (let* ((slot (assq key (vtable:methods self))))
     (if slot (cdr slot)
       (if (vtable:parent self)
-        (send 'lookup (vtable:parent self) key)
+        (send (vtable:parent self) 'lookup key)
         #f))))
  
-(define (bind op rcvr)
+(define (bind rcvr op)
   (let ((vt (vtable rcvr)))
     (if (and (eq? op 'lookup) (eq? vt <vtable>))
       (vtable:lookup vt op)
-      (send 'lookup vt op))))
+      (send vt 'lookup op))))
 
 (define *send-trace* #f)
 (define (set-send-trace! v)
@@ -74,19 +74,19 @@
 (define (send-w/o-trace op self . args)
   (let ((save *send-trace*))
     (set! *send-trace* #f)
-    (let ((result (apply (bind op self) self args)))
+    (let ((result (apply (bind self op) self args)))
       (set! *send-trace* save)
       result
       )))
 
-(define (send op self . args)
+(define (send self op . args)
   (if *send-trace*
     (begin
-      (send-w/o-trace 'write `(send ,op ,self . ,args))(newline)))
-  (let ((impl (bind op self)))
+      (send-w/o-trace `(send ,self ,op . ,args) 'write) (newline)))
+  (let ((impl (bind self op)))
     (if (not impl)
       (begin
-        (send-w/o-trace 'write `(send: cannot find ',op in ,(vtable self))) (newline)))
+        (send-w/o-trace `(send: cannot find ',op in ,(vtable self)) 'write) (newline)))
     (apply impl self args)))
  
 (define (object? self)
@@ -116,31 +116,33 @@
 (vtable:add-method <vtable> 'lookup vtable:lookup)
 (vtable:add-method <vtable> 'add-method vtable:add-method)
  
-(send 'add-method <vtable> 'alloc vtable:alloc)
-(send 'add-method <vtable> 'delegated vtable:delegated)
+(send <vtable> 'add-method 'alloc vtable:alloc)
+(send <vtable> 'add-method 'delegated vtable:delegated)
  
 ;; Additional vtable methods:
-(send 'add-method <vtable> 'new-vtable vtable:new-vtable)
-(send 'add-method <vtable> 'with-parent vtable:with-parent)
-(send 'add-method <vtable> 'with-parent-size vtable:with-parent-size)
-
-(send 'add-method <vtable> 'add-offset-accessor
+(send <vtable> 'add-method 'new-vtable vtable:new-vtable)
+(send <vtable> 'add-method 'with-parent vtable:with-parent)
+(send <vtable> 'add-method 'with-parent-size vtable:with-parent-size)
+(send <vtable> 'add-method 'add-offset-accessor
       (lambda (self name offset)
         (set! offset (+ offset 2))
-        (send 'add-method self name
+        (send self 'add-method name
               (lambda (self)       (vector-ref  self offset)))
-        (send 'add-method self (string->symbol (string-append (symbol->string name) "="))
+        (send self 'add-method (string->symbol (string-append (symbol->string name) "="))
               (lambda (self value) (vector-set! self offset value)))))
+(send <vtable> 'add-offset-accessor 'parent 0)
+(send <vtable> 'add-offset-accessor 'methods 1)
+(send <vtable> 'add-offset-accessor 'name 2)
 
-(send 'add-method <object> '_slot  object:_slot)
-(send 'add-method <object> '_slot= object:_slot=)
-(send 'add-method <object> 'vtable vtable)
-(send 'add-offset-accessor <object> '_vt -1)
-(send 'add-offset-accessor <vtable> 'parent 0)
-(send 'add-offset-accessor <vtable> 'methods 1)
+;; Additional object methods:
+(send <object> 'add-method '_slot  object:_slot)
+(send <object> 'add-method '_slot= object:_slot=)
+(send <object> 'add-method 'vtable vtable)
+(send <object> 'add-method '_send send)
+(send <object> 'add-offset-accessor '_vt -1)
 
-(send 'add-offset-accessor <vtable> 'name 2)
-(send 'name= <vtable> 'vtable)
-(send 'name= <object> 'object)
+;; Additional initializations:
+(send <vtable> 'name= 'vtable)
+(send <object> 'name= 'object)
 
 ))

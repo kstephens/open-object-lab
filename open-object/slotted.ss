@@ -8,80 +8,81 @@
     slotted-demo)
   (import (open-object) (rnrs))
 
-  (define <slotted-class-class>  (send 'new-vtable <vtable> 8 <vtable> <vtable>))
-  (define <slotted-class>        (send 'new-vtable <vtable> 8 <slotted-class-class> <slotted-class-class>))
-  (define <slotted-object-class> (send 'new-vtable <vtable> 8 <vtable> <slotted-class-class>))
-  (define <slotted-object>       (send 'new-vtable <vtable> 8 <slotted-class> <object>))
-  (define slotted                (send 'alloc <slotted-class-class> 0))
+  (define <slotted-class-class>  (send <vtable> 'new-vtable 8 <vtable> <vtable>))
+  (define <slotted-class>        (send <vtable> 'new-vtable 8 <slotted-class-class> <slotted-class-class>))
+  (define <slotted-object-class> (send <vtable> 'new-vtable 8 <vtable> <slotted-class-class>))
+  (define <slotted-object>       (send <vtable> 'new-vtable 8 <slotted-class> <object>))
+  (define slotted                (send <slotted-class-class> 'alloc 0))
 
   (define (slotted-demo)
     (display "  :: slotted-demo ::")(newline)
     (let ((cls #f) (obj #f))
     ; (set-send-trace! #t)
-      (set! cls (send 'new-class slotted 'cls <slotted-object> '(a b c)))
-      (send 'write cls)(newline)
-      (set! obj (send 'new cls))
-      (send 'a= obj 1)
-      (send 'c= obj 3)
-      (send 'write obj)(newline)
+      (set! cls (send slotted 'new-class 'cls <slotted-object> '(a b c)))
+      (send cls 'write)(newline)
+      (set! obj (send cls 'new))
+      (send obj 'a= 1)
+      (send obj 'c= 3)
+      (send obj 'write)(newline)
       ))
 
   (begin
-    ; (send 'parent= <slotted-class> <slotted-object>)
+    (send <slotted-class-class> 'name= 'slotted-class-class)
+    (send <slotted-class>  'name= 'slotted-class)
+    (send <slotted-object> 'name= 'slotted-object)
 
-    (send 'name= <slotted-class-class> 'slotted-class-class)
-    (send 'name= <slotted-class> 'slotted-class)
-    (send 'name= <slotted-object> 'slotted-object)
+    (send <slotted-class-class> 'add-offset-accessor 'slots 3)
+    (send <slotted-class-class> 'add-offset-accessor 'slot-i-map 4)
+    (send <slotted-class-class> 'add-offset-accessor 'slots-size 5)
 
-    (send 'add-offset-accessor <slotted-class-class> 'slots 3)
-    (send 'add-offset-accessor <slotted-class-class> 'slot-i-map 4)
-    (send 'add-offset-accessor <slotted-class-class> 'slots-size 5)
+    (send <slotted-object> 'slots= '())
+    (send <slotted-object> 'slot-i-map= '())
+    (send <slotted-object> 'slots-size= 0)
 
-    (send 'slots= <slotted-object> '())
-    (send 'slot-i-map= <slotted-object> '())
-    (send 'slots-size= <slotted-object> 0)
-
-    (send 'add-method <slotted-class-class>
+    (send <slotted-class-class> 'add-method
       'new-class
       (lambda (self name parent slots)
-        (let ((cls (send 'alloc <slotted-class> 8)))
-          (send 'initialize cls name parent slots))))
+        (let ((cls (send <slotted-class> 'alloc 8)))
+          (send cls 'initialize name parent slots))))
 
-    (send 'add-method <slotted-class>
+    (send <slotted-class> 'add-method
       'initialize
       (lambda (self name parent slots)
-        (send 'parent= self parent)
-        (send 'methods= self '())
-        (send 'name= self name)
-        (send 'slots= self slots)
-        ;; (send 'write (send '_vt parent))(newline)
-        (let ( (i (if parent (send 'slots-size parent) 0))
+        (send self 'parent= parent)
+        (send self 'methods= '())
+        (send self 'name= name)
+        (send self 'slots= slots)
+
+        (let ( (i (if parent (send parent 'slots-size) 0))
                (slot-i-map '()))
           (for-each
             (lambda (slot)
-              (send 'add-offset-accessor self slot i)
+              (send self 'add-offset-accessor slot i)
               (set! slot-i-map (cons (cons slot i) slot-i-map))
               (set! i (+ i 1))) slots)
-          (send 'slot-i-map= self (reverse slot-i-map))
-          (send 'slots-size= self i))
+          (send self 'slot-i-map= (reverse slot-i-map))
+          (send self 'slots-size= i))
         self))
 
-    (send 'add-method <slotted-class>
-      'new (lambda (self)
-             (send 'alloc self (send 'slots-size self))))
+    (send <slotted-class> 'add-method
+      'new (lambda (self . args)
+             (apply send (send self 'alloc (send self 'slots-size)) 'initialize args)))
+
+    (send <slotted-object> 'add-method
+      'initialize (lambda (self) self))
 
     ;; Addtional methods:
-    (send 'add-method <slotted-object>
+    (send <slotted-object> 'add-method
       'write (lambda (self)
                (display "#<")
-               (send 'write (send '_vt self))
+               (send (send self '_vt) 'write)
                (for-each
                  (lambda (slot-i)
                    (display " ")
-                   (send 'write (car slot-i))
+                   (send (car slot-i) 'write)
                    (display ": ")
-                   (send 'write (send '_slot self (cdr slot-i)))
-                   ) (send 'slot-i-map (send '_vt self)))
+                   (send (send self '_slot (cdr slot-i)) 'write)
+                   ) (send (send self '_vt) 'slot-i-map))
                (display " >")
                ))
     ))

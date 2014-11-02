@@ -8,53 +8,61 @@
 
 (define (write-demo)
   (display "  :: write-demo ::") (newline)
-  (send 'write <vtable>) (newline)
-  (send 'write <object>) (newline)
-  (send 'write 'a-symbol) (newline)
-  (send 'write 123) (newline)
-  (send 'write 1234.56) (newline)
-  (send 'write 1/23) (newline)
-  (send 'write '(a cons)) (newline)
+  (send <vtable> 'write) (newline)
+  (send <object> 'write) (newline)
+  (send 'a-symbol 'write) (newline)
+  (send 123 'write) (newline)
+  (send 1234.56 'write) (newline)
+  (send 1/23 'write) (newline)
+  (send '(a cons) 'write) (newline)
   (newline)
   )
 
 (begin
-  (send 'add-method <scheme> 'write write)
-  (send 'add-method <object>
+  (send <scheme> 'add-method 'write write)
+  (send <object> 'add-method
     'write (lambda (self)
              (display "#< ")
-             (send 'write (send 'vtable self))
+             (send (send self 'vtable) 'write)
              (display " ... >")
              ))
-  (send 'add-method <vtable>
+  (send <vtable> 'add-method
     'write (lambda (self)
              (display "#<vtable ")
-             (send 'write (send 'name self))
+             (send (send self 'name) 'write)
+             (if (and #f (not (eq? <vtable> self)))
+               (begin
+                 (display "\n  _vt: ")
+                 (send (send self '_vt) 'write)
+                 (display "\n  parent: ")
+                 (send (send self 'parent) 'write)
+                 ))
              (display ">")
              ))
-  (send 'add-method <vector>
+  (send <vector> 'add-method
     'write (lambda (self)
              (display "#(")
              (let loop ((i 0))
                (if (< i (vector-length self))
                  (begin
                    (if (> i 0) (display " "))
-                   (send 'write (vector-ref self i))
+                   (send (vector-ref self i) 'write)
                    (loop (+ i 1)))))
              (display ")")))
-  (send 'add-method <pair>
+  (send <pair> 'add-method
     'write (lambda (self)
              (display "(")
-             (let loop ((obj self))
+             (send (car self) 'write)
+             (let loop ((obj (cdr self)))
                (cond
                  ((pair? obj)
-                   (send 'write (car obj))
                    (display " ")
+                   (send (car obj) 'write)
                    (loop (cdr obj)))
                  ((null? obj)
                    (display ")"))
                  (else 
-                   (display ". ")
-                   (send 'write obj)
+                   (display " . ")
+                   (send obj 'write)
                    (display ")"))))))
   ))
