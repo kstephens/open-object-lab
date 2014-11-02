@@ -73,16 +73,16 @@
 
     ;; Addtional methods:
     (send <slotted-object> 'add-method
-      'write (lambda (self)
-               (display "#<")
-               (send (send self '_vt) 'write)
+      'write-to (lambda (self port)
+               (display "#<" port)
+               (send (send self '_vt) 'write-to port)
                (for-each
                  (lambda (slot-i)
-                   (display " ")
-                   (send (car slot-i) 'write)
-                   (display ": ")
-                   (send (send self '_slot (cdr slot-i)) 'write)
+                   (display " " port)
+                   (send (car slot-i) 'write-to port)
+                   (display ": " port)
+                   (send (send self '_slot (cdr slot-i)) 'write-to port)
                    ) (send (send self '_vt) 'slot-i-map))
-               (display " >")
+               (display " >" port)
                ))
     ))

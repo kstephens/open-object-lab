@@ -48,4 +48,33 @@
     ((vector?  self)  <vector>)
     ((port?    self)  <port>)
     (else             <scheme>))))
+
+  (send <scheme> 'add-method 'write-to write)
+  (send <vector> 'add-method
+    'write-to (lambda (self port)
+             (display "#(" port)
+             (let loop ((i 0))
+               (if (< i (vector-length self))
+                 (begin
+                   (if (> i 0) (display " " port))
+                   (send (vector-ref self i) 'write-to port)
+                   (loop (+ i 1)))))
+             (display ")" port)))
+  (send <pair> 'add-method
+    'write-to (lambda (self port)
+             (display "(" port)
+             (send (car self) 'write-to port)
+             (let loop ((obj (cdr self)))
+               (cond
+                 ((pair? obj)
+                   (display " " port)
+                   (send (car obj) 'write-to port)
+                   (loop (cdr obj)))
+                 ((null? obj)
+                   (display ")" port))
+                 (else
+                   (display " . " port)
+                   (send obj 'write-to port)
+                   (display ")" port))))))
+
 ))
