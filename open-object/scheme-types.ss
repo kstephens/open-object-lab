@@ -6,7 +6,7 @@
     <boolean>
     <number> <complex> <real> <rational> <integer>
     <symbol>
-    <sequence> <string> <list> <pair> <null> <vector>)
+    <sequence> <string> <list> <pair> <null> <vector> <port>)
   (import (open-object) (rnrs))
 
 (define <scheme>   (send <vtable> 'with-parent <object>))
@@ -23,6 +23,7 @@
 (define <pair>     (send <vtable> 'with-parent <list>))
 (define <null>     (send <vtable> 'with-parent <list>))
 (define <vector>   (send <vtable> 'with-parent <sequence>))
+(define <port>     (send <vtable> 'with-parent <sequence>))
 
 (begin
   (send <scheme> 'name= 'scheme)
@@ -33,6 +34,7 @@
 ;; Extend vtable determination into Scheme types:
 (set-vtable-proc! (lambda (self)
   (cond
+    ((object?  self)  (object:_vt self))
     ((boolean? self)  <boolean>)
     ((string?  self)  <string>)
     ((symbol?  self)  <symbol>)
@@ -43,7 +45,7 @@
     ((real?    self)  <real>)
     ((complex? self)  <complex>)
     ((number?  self)  <number>)
-    ((object?  self)  (object:_vt self))
     ((vector?  self)  <vector>)
+    ((port?    self)  <port>)
     (else             <scheme>))))
 ))
