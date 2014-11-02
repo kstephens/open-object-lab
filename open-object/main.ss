@@ -28,12 +28,15 @@
 (define (vtable:methods  self)   (object:_slot  self 1))
 (define (vtable:methods= self v) (object:_slot= self 1 v))
 
+(define (vtable:new-vtable self size vtable parent)
+  (let ((obj (vtable:alloc self size)))
+    (object:_vt=     obj vtable)
+    (vtable:parent=  obj parent)
+    (vtable:methods= obj '())
+    obj))
+
 (define (vtable:with-parent-size self parent size)
-  (let ((child (vtable:alloc self size)))
-    (object:_vt=     child (and self (vtable self)))
-    (vtable:parent=  child parent)
-    (vtable:methods= child '())
-    child))
+  (vtable:new-vtable self size (and self (vtable self)) parent))
 
 (define (vtable:with-parent self parent)
   (vtable:with-parent-size self parent 4))
@@ -117,6 +120,7 @@
 (send 'add-method <vtable> 'delegated vtable:delegated)
  
 ;; Additional vtable methods:
+(send 'add-method <vtable> 'new-vtable vtable:new-vtable)
 (send 'add-method <vtable> 'with-parent vtable:with-parent)
 (send 'add-method <vtable> 'with-parent-size vtable:with-parent-size)
 
