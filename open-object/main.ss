@@ -10,30 +10,27 @@
 
 (define object:tag '(OBJECT))
 
-(define (object:_vt  self)
-  (vector-ref  self 1))
-(define (object:_vt= self value)
-  (vector-set! self 1 value))
+(define (object:_vt  self)    (object:_slot  self -1))
+(define (object:_vt= self v)  (object:_slot= self -1 v))
  
 (define (vtable:alloc self size)
-  (let ((obj (make-vector (+ size 2))))
+  (let ((obj (make-vector (+ size 2) #f)))
     (vector-set! obj 0 object:tag)
     (object:_vt= obj self)
     obj))
  
-(define (vtable:parent  self)
-  (vector-ref  self 2))
-(define (vtable:parent= self value)
-  (vector-set! self 2 value))
+(define (object:_slot  self i)   (vector-ref  self (+ i 2)))
+(define (object:_slot= self i v) (vector-set! self (+ i 2) v))
+
+(define (vtable:parent  self)    (object:_slot  self 0))
+(define (vtable:parent= self v)  (object:_slot= self 0 v))
  
-(define (vtable:methods  self)
-  (vector-ref  self 3))
-(define (vtable:methods= self value)
-  (vector-set! self 3 value))
+(define (vtable:methods  self)   (object:_slot  self 1))
+(define (vtable:methods= self v) (object:_slot= self 1 v))
 
 (define (vtable:with-parent-size self parent size)
   (let ((child (vtable:alloc self size)))
-    (object:_vt=      child (and self (vtable self)))
+    (object:_vt=     child (and self (vtable self)))
     (vtable:parent=  child parent)
     (vtable:methods= child '())
     child))
@@ -131,6 +128,8 @@
         (send 'add-method self (string->symbol (string-append (symbol->string name) "="))
               (lambda (self value) (vector-set! self offset value)))))
 
+(send 'add-method <object> '_slot  object:_slot)
+(send 'add-method <object> '_slot= object:_slot=)
 (send 'add-method <object> 'vtable vtable)
 (send 'add-offset-accessor <object> '_vt -1)
 (send 'add-offset-accessor <vtable> 'parent 0)
