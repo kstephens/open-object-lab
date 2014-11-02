@@ -68,7 +68,7 @@
 (define (set-send-trace! v)
   (set! *send-trace* v))
 
-(define (_send op self . args)
+(define (send-w/o-trace op self . args)
   (let ((save *send-trace*))
     (set! *send-trace* #f)
     (let ((result (apply (bind op self) self args)))
@@ -79,11 +79,11 @@
 (define (send op self . args)
   (if *send-trace*
     (begin
-      (_send 'write `(send ,op ,self . ,args))(newline)))
+      (send-w/o-trace 'write `(send ,op ,self . ,args))(newline)))
   (let ((impl (bind op self)))
     (if (not impl)
       (begin
-        (_send 'write `(send: cannot find ',op in ,(vtable self))) (newline)))
+        (send-w/o-trace 'write `(send: cannot find ',op in ,(vtable self))) (newline)))
     (apply impl self args)))
  
 (define (object? self)
