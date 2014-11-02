@@ -19,7 +19,13 @@
   )
 
 (begin
-  (send 'add-method <object> 'write write)
+  (send 'add-method <scheme> 'write write)
+  (send 'add-method <object>
+    'write (lambda (self)
+             (display "#< ")
+             (send 'write (send 'vtable self))
+             (display " ... >")
+             ))
   (send 'add-method <vtable>
     'write (lambda (self)
              (display "#<vtable ")
