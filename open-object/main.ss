@@ -27,11 +27,11 @@
 (define (object:_slot  self i)   (vector-ref  self (+ i 2)))
 (define (object:_slot= self i v) (vector-set! self (+ i 2) v))
 
-(define (vtable:parent  self)    (object:_slot  self 0))
-(define (vtable:parent= self v)  (object:_slot= self 0 v))
+(define (vtable:parent  self)    (object:_slot  self 1))
+(define (vtable:parent= self v)  (object:_slot= self 1 v))
  
-(define (vtable:methods  self)   (object:_slot  self 1))
-(define (vtable:methods= self v) (object:_slot= self 1 v))
+(define (vtable:methods  self)   (object:_slot  self 2))
+(define (vtable:methods= self v) (object:_slot= self 2 v))
 
 (define (vtable:new-vtable self size vtable parent)
   (let ((obj (vtable:alloc self size)))
@@ -133,9 +133,9 @@
               (lambda (self)       (vector-ref  self offset)))
         (send self 'add-method (string->symbol (string-append (symbol->string name) "="))
               (lambda (self value) (vector-set! self offset value)))))
-(send <vtable> 'add-offset-accessor 'parent 0)
-(send <vtable> 'add-offset-accessor 'methods 1)
-(send <vtable> 'add-offset-accessor 'name 2)
+(send <vtable> 'add-offset-accessor 'name 0)
+(send <vtable> 'add-offset-accessor 'parent 1)
+(send <vtable> 'add-offset-accessor 'methods 2)
 
 ;; Additional object methods:
 (send <object> 'add-method '_slot  object:_slot)
