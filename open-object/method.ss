@@ -1,5 +1,5 @@
 #!r6rs
-;; Additional vtables for Scheme types:
+;;; method objects with super.
 (library (open-object method)
   (export <method>)
   (import
