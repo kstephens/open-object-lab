@@ -80,4 +80,21 @@
                    (send obj 'write-to port)
                    (display ")" port))))))
 
+(send <sequence> 'add-method
+  'map (lambda (self proc)
+         (let ((acc '()))
+           (send self 'for-each
+             (lambda (e)
+               (set! acc (cons (proc e) acc))))
+           (reverse acc))))
+(send <string> 'add-method
+  'for-each (lambda (self proc)
+          (string-for-each self proc)))
+(send <list> 'add-method
+  'for-each (lambda (self proc)
+          (for-each self proc)))
+(send <vector> 'add-method
+  'for-each (lambda (self proc)
+          (vector-for-each self proc)))
+
 ))
