@@ -7,7 +7,7 @@
     <slotted-object-class> <slotted-object>)
   (import
     (open-object)
-    (open-object with)
+    (open-object to)
     (rnrs))
 
   (define <slotted-class-class>  (send <vtable> 'new-vtable 8 <vtable> <vtable>))
@@ -21,12 +21,12 @@
     (send <slotted-class>  'name= 'slotted-class)
     (send <slotted-object> 'name= 'slotted-object)
 
-    (with <slotted-class-class>
+    (to <slotted-class-class>
       (send 'add-offset-accessor 'slots 3)
       (send 'add-offset-accessor 'slot-i-map 4)
       (send 'add-offset-accessor 'slots-size 5))
 
-    (with <slotted-object>
+    (to <slotted-object>
       (send 'slots= '())
       (send 'slot-i-map= '())
       (send 'slots-size= 0))

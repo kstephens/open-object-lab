@@ -9,7 +9,7 @@
   (import
     (rnrs)
     (rnrs mutable-pairs (6))
-    (open-object with))
+    (open-object to))
 
 (define object:tag '(OBJECT))
 
@@ -128,7 +128,7 @@
 (send <vtable> 'add-method 'delegated vtable:delegated)
  
 ;; Additional vtable methods:
-(with <vtable>
+(to <vtable>
   (send 'add-method 'new-vtable vtable:new-vtable)
   (send 'add-method 'with-parent vtable:with-parent)
   (send 'add-method 'with-parent-size vtable:with-parent-size)
@@ -146,7 +146,7 @@
 )
 
 ;; Additional object methods:
-(with <object>
+(to <object>
   (send 'name= 'object)
   (send 'add-method '_slot  object:_slot)
   (send 'add-method '_slot= object:_slot=)

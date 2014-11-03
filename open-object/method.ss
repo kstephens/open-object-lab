@@ -5,13 +5,12 @@
   (import
     (rnrs)
     (open-object)
-    (open-object with)
+    (open-object to)
     (open-object scheme-types)
     (open-object slotted))
 
   (define <method>
-    (with 
-      (send slotted 'new-class 'method <slotted-object> '(proc op impl))
+    (to (send slotted 'new-class 'method <slotted-object> '(proc op impl))
       (send 'add-method 'initialize
         (lambda (self proc)
           (send self 'proc= proc)
