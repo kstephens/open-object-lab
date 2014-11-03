@@ -55,6 +55,8 @@
 (define (vtable:add-method self key value)
   (let* ( (methods (vtable:methods self))
           (slot (assq key methods)))
+    (if (not (procedure? value))
+      (send value 'method-added-to self key))
     (if slot
       (set-cdr! slot value)
       (vtable:methods= self (cons (cons key value) methods)))))

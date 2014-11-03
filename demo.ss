@@ -4,6 +4,7 @@
   (open-object scheme-types)
   (open-object write)
   (open-object slotted)
+  (open-object method)
   (rnrs))
 
 (define (write-demo)
@@ -35,3 +36,21 @@
     ))
 (slotted-demo)
 
+(define (method-demo)
+  (display "\n  :: method-demo ::\n")
+
+  (send <object> 'add-method 'overridden
+    (send <method> 'new (lambda (meth self)
+                          (write `(,self as <object>))
+                          (newline))))
+
+  (send <string> 'add-method 'overridden
+    (send <method> 'new (lambda (meth self)
+                          (write `(,self as <string>))
+                          (newline)
+                          (send meth 'super self))))
+
+  (send 1        'overridden)
+  (send "string" 'overridden)
+  )
+(method-demo)
