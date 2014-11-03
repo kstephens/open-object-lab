@@ -3,7 +3,7 @@
 (library (open-object)
   (export
     <vtable> <object>
-    send
+    send send-via
     set-vtable-proc! object? object:_vt
     set-send-trace!)
   (import (rnrs) (rnrs mutable-pairs (6)))
@@ -19,6 +19,11 @@
     (object:_vt= obj self)
     obj))
  
+(define (object? self)
+  (and (vector? self)
+       (>= (vector-length self) 2)
+       (eq? (vector-ref self 0) object:tag)))
+
 (define (object:_slot  self i)   (vector-ref  self (+ i 2)))
 (define (object:_slot= self i v) (vector-set! self (+ i 2) v))
 
@@ -60,49 +65,47 @@
       (if (vtable:parent self)
         (send (vtable:parent self) 'lookup key)
         #f))))
- 
-(define (bind rcvr op)
-  (let ((vt (vtable rcvr)))
-    (if (and (eq? op 'lookup) (eq? vt <vtable>))
-      (vtable:lookup vt op)
-      (send vt 'lookup op))))
 
-(define *send-trace* #f)
-(define (set-send-trace! v)
-  (set! *send-trace* v))
+(define (lookup vt op)
+  (if (and (eq? op 'lookup) (eq? vt <vtable>))
+    (vtable:lookup vt op)
+    (send vt 'lookup op)))
 
-(define (send-w/o-trace op self . args)
-  (let ((save *send-trace*))
-    (set! *send-trace* #f)
-    (let ((result (apply (bind self op) self args)))
-      (set! *send-trace* save)
-      result
-      )))
+(define (method:apply self rcvr vt op args)
+  (cond
+    ((procedure? self)
+      (apply self rcvr args))
+    ((not self)
+      (send `(method:apply: ERROR: cannot find method for ,op in ,vt) 'write) (newline)
+      (error "method:apply" `(cannot find method for ,op in ,vt)))
+    (else
+      (send self 'apply rcvr vt op args))))
 
-(define (send self op . args)
+(define (send-via rcvr vt op . args)
   (if *send-trace*
     (begin
-      (send-w/o-trace `(send ,self ,op . ,args) 'write) (newline)))
-  (let ((impl (bind self op)))
-    (if (not impl)
-      (begin
-        (send-w/o-trace `(send: cannot find ',op in ,(vtable self)) 'write) (newline)))
-    (apply impl self args)))
- 
-(define (object? self)
-  (and (vector? self)
-       (>= (vector-length self) 2)
-       (eq? (vector-ref self 0) object:tag)))
+      (send-w/o-trace `(send-via ,rcvr ,vt ,op . ,args) 'write) (newline)))
+  (method:apply (lookup vt op) rcvr vt op args))
+
+(define (send rcvr op . args)
+  (apply send-via rcvr (vtable rcvr) op args))
+
+(define *send-trace* #f)
+(define (set-send-trace! v) (set! *send-trace* v))
+(define (send-w/o-trace rcvr op . args)
+  (let ((save *send-trace*))
+    (set! *send-trace* #f)
+    (let ((result (apply send rcvr op args)))
+      (set! *send-trace* save)
+      result)))
 
 (define vtable-proc
   (lambda (self)
     (cond
       ((object? self)   (object:_vt self))
       (else             <object>))))
-
 (define (set-vtable-proc! proc)
   (set! vtable-proc proc))
-
 (define (vtable self)
   (vtable-proc self))
  
