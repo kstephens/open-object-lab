@@ -4,8 +4,7 @@
   (export
     slotted
     <slotted-class-class> <slotted-class>
-    <slotted-object-class> <slotted-object>
-    slotted-demo)
+    <slotted-object-class> <slotted-object>)
   (import (open-object) (rnrs))
 
   (define <slotted-class-class>  (send <vtable> 'new-vtable 8 <vtable> <vtable>))
@@ -13,18 +12,6 @@
   (define <slotted-object-class> (send <vtable> 'new-vtable 8 <vtable> <slotted-class-class>))
   (define <slotted-object>       (send <vtable> 'new-vtable 8 <slotted-class> <object>))
   (define slotted                (send <slotted-class-class> 'alloc 0))
-
-  (define (slotted-demo)
-    (display "  :: slotted-demo ::")(newline)
-    (let ((cls #f) (obj #f))
-    ; (set-send-trace! #t)
-      (set! cls (send slotted 'new-class 'cls <slotted-object> '(a b c)))
-      (send cls 'write)(newline)
-      (set! obj (send cls 'new))
-      (send obj 'a= 1)
-      (send obj 'c= 3)
-      (send obj 'write)(newline)
-      ))
 
   (begin
     (send <slotted-class-class> 'name= 'slotted-class-class)

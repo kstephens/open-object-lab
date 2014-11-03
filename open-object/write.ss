@@ -1,21 +1,9 @@
 #!r6rs
 (library (open-object write)
-  (export write-demo)
+  (export)
   (import
     (open-object)
     (rnrs))
-
-(define (write-demo)
-  (display "  :: write-demo ::") (newline)
-  (send <vtable> 'write) (newline)
-  (send <object> 'write) (newline)
-  (send 'a-symbol 'write) (newline)
-  (send 123 'write) (newline)
-  (send 1234.56 'write) (newline)
-  (send 1/23 'write) (newline)
-  (send '(a cons) 'write) (newline)
-  (newline)
-  )
 
 (begin
   (send <object> 'add-method 'write
