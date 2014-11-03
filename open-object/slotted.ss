@@ -1,11 +1,14 @@
 #!r6rs
-;; Additional vtables for Scheme types:
+;;; Slotted object classes.
 (library (open-object scheme-types)
   (export
     slotted
     <slotted-class-class> <slotted-class>
     <slotted-object-class> <slotted-object>)
-  (import (open-object) (rnrs))
+  (import
+    (open-object)
+    (open-object with)
+    (rnrs))
 
   (define <slotted-class-class>  (send <vtable> 'new-vtable 8 <vtable> <vtable>))
   (define <slotted-class>        (send <vtable> 'new-vtable 8 <slotted-class-class> <slotted-class-class>))
@@ -18,13 +21,15 @@
     (send <slotted-class>  'name= 'slotted-class)
     (send <slotted-object> 'name= 'slotted-object)
 
-    (send <slotted-class-class> 'add-offset-accessor 'slots 3)
-    (send <slotted-class-class> 'add-offset-accessor 'slot-i-map 4)
-    (send <slotted-class-class> 'add-offset-accessor 'slots-size 5)
+    (with <slotted-class-class>
+      (send 'add-offset-accessor 'slots 3)
+      (send 'add-offset-accessor 'slot-i-map 4)
+      (send 'add-offset-accessor 'slots-size 5))
 
-    (send <slotted-object> 'slots= '())
-    (send <slotted-object> 'slot-i-map= '())
-    (send <slotted-object> 'slots-size= 0)
+    (with <slotted-object>
+      (send 'slots= '())
+      (send 'slot-i-map= '())
+      (send 'slots-size= 0))
 
     (send <slotted-class-class> 'add-method
       'new-class
