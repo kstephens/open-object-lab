@@ -13,7 +13,7 @@
   (send <object> 'add-method
     'write-to (lambda (self port)
              (display "#< " port)
-             (send (send self 'vtable) 'write-to port)
+             (send (send self '_vtable) 'write-to port)
              (display " ... >" port)
              ))
   (send <vtable> 'add-method

@@ -150,7 +150,7 @@
   (send 'name= 'object)
   (send 'add-method '_slot  object:_slot)
   (send 'add-method '_slot= object:_slot=)
-  (send 'add-method 'vtable vtable)
+  (send 'add-method '_vtable vtable)
   (send 'add-method '_send send)
   (send 'add-offset-accessor '_vt -1)
 )
