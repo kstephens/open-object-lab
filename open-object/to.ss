@@ -12,18 +12,14 @@
 
   (define-syntax to
     (syntax-rules ()
-      ((to expr subexpr subexprs ...)
+      ((to expr subexprs ...)
         (let ((value expr))
-          (to-1st value subexpr)
-          (to-1st-exprs value subexprs) ...
-          value))))
+          (to-1st-exprs value subexprs ...)))))
 
   (define-syntax to-1st-exprs
     (syntax-rules ()
       ((to-1st-exprs value)
         value)
-      ((to-1st-exprs value app)
-        (to-1st value app))
       ((to-1st-exprs value app apps ...)
         (begin (to-1st value app) (to-1st-exprs value apps ...)))))
 
