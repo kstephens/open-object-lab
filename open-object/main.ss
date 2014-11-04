@@ -16,10 +16,13 @@
 (define (object:_vt  self)    (object:_slot  self -1))
 (define (object:_vt= self v)  (object:_slot= self -1 v))
  
+(define (object:_slot  self i)   (vector-ref  self (+ i 2)))
+(define (object:_slot= self i v) (vector-set! self (+ i 2) v))
+
 (define (vtable:alloc self size)
   (let ((obj (make-vector (+ size 2) #f)))
-    (vector-set! obj 0 object:tag)
-    (object:_vt= obj self)
+    (object:_slot= obj -2 object:tag)
+    (object:_slot= obj -1 self)
     obj))
  
 (define (object? self)
@@ -27,20 +30,14 @@
        (>= (vector-length self) 2)
        (eq? (vector-ref self 0) object:tag)))
 
-(define (object:_slot  self i)   (vector-ref  self (+ i 2)))
-(define (object:_slot= self i v) (vector-set! self (+ i 2) v))
-
-(define (vtable:parent  self)    (object:_slot  self 1))
-(define (vtable:parent= self v)  (object:_slot= self 1 v))
- 
 (define (vtable:methods  self)   (object:_slot  self 2))
 (define (vtable:methods= self v) (object:_slot= self 2 v))
 
 (define (vtable:new-vtable self size vtable parent)
   (let ((obj (vtable:alloc self size)))
-    (object:_vt=     obj vtable)
-    (vtable:parent=  obj parent)
-    (vtable:methods= obj '())
+    (object:_slot= obj -1 vtable)
+    (object:_slot= obj  1 parent)
+    (object:_slot= obj  2 '())
     obj))
 
 (define (vtable:with-parent-size self parent size)
@@ -66,10 +63,12 @@
  
 (define (vtable:lookup self key)
   (let* ((slot (assq key (vtable:methods self))))
-    (if slot (cdr slot)
-      (if (vtable:parent self)
-        (send (vtable:parent self) 'lookup key)
-        #f))))
+    (if slot
+      (cdr slot)
+      (let ((parent (object:_slot self 1)))
+        (if parent
+          (send parent 'lookup key)
+          #f)))))
 
 (define (lookup vt op)
   (if (and (eq? op 'lookup) (eq? vt <vtable>))
@@ -106,9 +105,7 @@
 
 (define vtable-proc
   (lambda (self)
-    (cond
-      ((object? self)   (object:_vt self))
-      (else             <object>))))
+    (if (object? self) (object:_slot self -1) <object>)))
 (define (set-vtable-proc! proc)
   (set! vtable-proc proc))
 (define (vtable self)
