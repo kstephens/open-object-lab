@@ -7,25 +7,42 @@
 ;;;     (send v c)
 ;;;     v)
 (library (open-object to)
-  (export to)
+  (export to to*)
   (import (rnrs))
+
+  (define-syntax to*
+    (syntax-rules ()
+      ((to* (expr exprs ...) apps ...)
+        (to expr
+          (to* (exprs ...) apps ...)))
+      ((to* (expr) apps ...)
+        (to expr apps ...))
+      ((to* () apps ...)
+        (begin apps ...))
+      ))
 
   (define-syntax to
     (syntax-rules ()
-      ((to expr subexprs ...)
+      ((to expr apps ...)
         (let ((value expr))
-          (to-1st-exprs value subexprs ...)))))
+          (to-apps (value) apps ...)))))
 
-  (define-syntax to-1st-exprs
+  (define-syntax to-apps
     (syntax-rules ()
-      ((to-1st-exprs value)
-        value)
-      ((to-1st-exprs value app apps ...)
-        (begin (to-1st value app) (to-1st-exprs value apps ...)))))
+      ((to-apps (values ...))
+        (begin values ...))
+      ((to-apps (values ...) app apps ...)
+        (begin
+          (to-app (values ...) app)
+          (to-apps (values ...) apps ...)))))
 
-  (define-syntax to-1st
-    (syntax-rules ()
-      ((to-1st value (proc args ...))
-        (proc value args ...))))
+  (define-syntax to-app
+    (syntax-rules (to)
+      ((to-app (values ...) (to expr apps ...))
+        (let ((value2 expr))
+          (to-apps (values ... value2) apps ...)))
+      ((to-app (values ...) (proc args ...))
+        (proc values ... args ...))
+      ))
 
 )
