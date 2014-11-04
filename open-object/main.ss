@@ -127,29 +127,33 @@
  
 ;; Additional vtable methods:
 (to <vtable>
-  (send 'add-method 'new-vtable vtable:new-vtable)
-  (send 'add-method 'with-parent vtable:with-parent)
-  (send 'add-method 'with-parent-size vtable:with-parent-size)
-  (send 'add-method 'add-offset-accessor
-        (lambda (self name offset)
-          (set! offset (+ offset 2))
-          (send self 'add-method name
-                (lambda (self)       (vector-ref  self offset)))
-          (send self 'add-method (string->symbol (string-append (symbol->string name) "="))
-                (lambda (self value) (vector-set! self offset value)))))
-  (send 'add-offset-accessor 'name 0)
-  (send 'add-offset-accessor 'parent 1)
-  (send 'add-offset-accessor 'methods 2)
+  (to 'add-method
+    (send 'new-vtable vtable:new-vtable)
+    (send 'with-parent vtable:with-parent)
+    (send 'with-parent-size vtable:with-parent-size)
+    (send 'add-offset-accessor
+      (lambda (self name offset)
+        (set! offset (+ offset 2))
+        (send self 'add-method name
+          (lambda (self)       (vector-ref  self offset)))
+        (send self 'add-method (string->symbol (string-append (symbol->string name) "="))
+          (lambda (self value) (vector-set! self offset value)))))
+    )
+  (to 'add-offset-accessor
+    (send 'name 0)
+    (send 'parent 1)
+    (send 'methods 2))
   (send 'name= 'vtable)
 )
 
 ;; Additional object methods:
 (to <object>
   (send 'name= 'object)
-  (send 'add-method '_slot  object:_slot)
-  (send 'add-method '_slot= object:_slot=)
-  (send 'add-method '_vtable vtable)
-  (send 'add-method '_send send)
+  (to 'add-method
+    (send '_slot  object:_slot)
+    (send '_slot= object:_slot=)
+    (send '_vtable vtable)
+    (send '_send send))
   (send 'add-offset-accessor '_vt -1)
 )
 

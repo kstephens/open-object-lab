@@ -22,9 +22,10 @@
     (send <slotted-object> 'name= 'slotted-object)
 
     (to <slotted-class-class>
-      (send 'add-offset-accessor 'slots 3)
-      (send 'add-offset-accessor 'slot-i-map 4)
-      (send 'add-offset-accessor 'slots-size 5))
+      (to 'add-offset-accessor
+        (send 'slots 3)
+        (send 'slot-i-map 4)
+        (send 'slots-size 5)))
 
     (to <slotted-object>
       (send 'slots= '())
