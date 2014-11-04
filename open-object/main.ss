@@ -116,16 +116,17 @@
 
 ;; Bootstrap vtables:
 (begin
-(object:_vt= <vtable> <vtable>)
-(object:_vt= <object> <vtable>)
+(object:_slot= <vtable> -1 <vtable>)
+(object:_slot= <object> -1 <vtable>)
+
+(to <vtable>
+  (object:_slot= 1 <object>)
+
+  (vtable:add-method 'lookup vtable:lookup)
+  (vtable:add-method 'add-method vtable:add-method)
  
-(vtable:parent= <vtable> <object>)
- 
-(vtable:add-method <vtable> 'lookup vtable:lookup)
-(vtable:add-method <vtable> 'add-method vtable:add-method)
- 
-(send <vtable> 'add-method 'alloc vtable:alloc)
-(send <vtable> 'add-method 'delegated vtable:delegated)
+  (send 'add-method 'alloc vtable:alloc)
+  (send 'add-method 'delegated vtable:delegated))
  
 ;; Additional vtable methods:
 (to <vtable>
