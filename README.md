@@ -24,12 +24,14 @@ Objects at this level are tagged Scheme vectors.
 Everything above this level is accomplished by (send rcvr op . args).
 However, there are a few additional low-level provisions for extension:
 
+* (method:apply ...)
+Delegates to (send meth 'apply rcvr vt op args) for methods that are not Scheme procedures.
+* (vtable:add-method ...)
+Invokes (send meth 'method-added-to vt op) for methods that are not Scheme procedures.
 * (object:vtable value)
 Returns a vtable given any Scheme value.
 * (object? value)
 Return true if value is a tagged Scheme vector.
-* (method:apply ...)
-Delegates to (send 'apply) for methods that are not Scheme procedures.
 * (send obj '_slot offset)
 * (send obj '_slot= offset value)
 Accessors into tagged Object vectors.
@@ -56,6 +58,7 @@ open-object/method.ss
 ---------------------
 
 Methods that implement super.
-Implemented with slotted objects.
-Uses the (send 'apply) protocol in (method:apply).
 
+Uses protocols:
+* (send 'apply rcvr vt op args)  in (method:apply)
+* (send 'method-added-to method vtable op) in (vtable:add-method)
