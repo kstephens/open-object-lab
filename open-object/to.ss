@@ -37,7 +37,9 @@
           (to-apps (values ...) apps ...)))))
 
   (define-syntax to-app
-    (syntax-rules (to)
+    (syntax-rules (to begin)
+      ((to-app (values ...) (begin body ...))
+       (begin body ...))
       ((to-app (values ...) (to expr apps ...))
         (let ((value2 expr))
           (to-apps (values ... value2) apps ...)))
