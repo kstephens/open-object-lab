@@ -41,23 +41,27 @@
   (display "\n  :: method-demo ::\n")
 
   (send <object> 'add-method 'overridden
-    (send <method> 'new (lambda (msg self)
-                          (write `(<object> ,self))
-                          (newline))))
+    (send <method> 'new
+      (lambda (msg self)
+        (write `(<object> ,self))
+        (newline))))
 
   (send <number> 'add-method 'overridden
-    (send <method> 'new (lambda (msg self)
-                          (write `(<number> ,self))
-                          (newline)
-                          (send msg 'super))))
+    (send <method> 'new
+      (lambda (msg self)
+        (write `(<number> ,self))
+        (newline)
+        (send msg 'super))))
 
   (send <integer> 'add-method 'overridden
-    (send <method> 'new (lambda (msg self)
-                          (write `(<integer> ,self))
-                          (newline)
-                          (send msg 'super))))
-  (send "foo" 'overridden)
-  (send 1     'overridden)
-  (send 2.34  'overridden)
+    (send <method> 'new
+      (lambda (msg self)
+        (write `(<integer> ,self))
+        (newline)
+        (send msg 'super))))
+
+  (send "foo" 'overridden) (newline)
+  (send 1     'overridden) (newline)
+  (send 2.34  'overridden) (newline)
   )
 (method-demo)
