@@ -5,6 +5,8 @@
   (open-object write)
   (open-object slotted)
   (open-object method)
+  (open-object define-named)
+  (open-object to)
   (rnrs))
 
 (define (write-demo)
@@ -22,13 +24,14 @@
 
 (define (slotted-demo)
   (display "\n  :: slotted-demo ::\n")
-  (let ((cls #f) (obj #f))
-  ; (set-send-trace! #t)
-    (set! cls (send slotted 'new-class <slotted-object> '(a b c)))
-    (send cls 'add-method 'initialize
-      (lambda (self b)
-        (send self 'b= b)
-        self))
+  (let ((obj #f))
+    (define-named cls
+      (to
+        (send slotted 'new-class <slotted-object> '(a b c))
+        (send 'add-method 'initialize
+          (lambda (self b)
+            (send self 'b= b)
+            self))))
     (send cls 'write)(newline)
     (set! obj (send cls 'new 2))
     (send obj 'a= 1)
