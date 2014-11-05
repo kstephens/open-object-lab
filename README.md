@@ -19,13 +19,13 @@ Overview
 open-object/main.ss
 -------------------
 
-The basic <object> and <vtable> object model as described in the paper.
+The basic object model as described in the paper.
 Objects at this level are tagged Scheme vectors.
 Everything above this level is accomplished by (send rcvr op . args).
 However, there are a few additional low-level provisions for extension:
 
 * (object:vtable value)
-Returns a <vtable> given any Scheme value.
+Returns a vtable given any Scheme value.
 * (object? value)
 Return true if value is a tagged Scheme vector.
 * (method:apply ...)
@@ -34,7 +34,7 @@ Delegates to (send 'apply) for methods that are not Scheme procedures.
 * (send obj '_slot= offset value)
 Accessors into tagged Object vectors.
 * (send vtable 'name)
-<vtable> names for debugging purposes.
+vtable names for debugging purposes.
 
 open-object/write.ss
 --------------------
