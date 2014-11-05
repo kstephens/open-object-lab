@@ -26,7 +26,7 @@ Everything above this level is accomplished by (send rcvr op . args).
 Send is defined as:
 
     (define (send rcvr op . args)
-      (apply (bind rcvr (vtable rcvr)) rcvr args))
+      (apply (bind rcvr (vtable rcvr) op) rcvr args))
 
 There are a few additional low-level provisions for extension:
 
