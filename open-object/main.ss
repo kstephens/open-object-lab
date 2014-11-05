@@ -3,7 +3,7 @@
 (library (open-object)
   (export
     <vtable> <object>
-    send send-via
+    send
     set-vtable-proc! object? object:_vt)
   (import
     (rnrs)
@@ -11,8 +11,8 @@
     (open-object to))
 
 (define (send rcvr op . args)
-  (apply send-via rcvr (vtable rcvr) op args))
-(define (send-via rcvr vt op . args)
+  (apply send-vt rcvr (vtable rcvr) op args))
+(define (send-vt rcvr vt op . args)
   (method:apply (lookup vt op) rcvr vt op args))
 (define (lookup vt op)
   (if (and (eq? op 'lookup) (eq? vt <vtable>))
@@ -115,7 +115,7 @@
     (send '_slot= object:_slot=)
     (send '_vtable vtable)
     (send '_send send)
-    (send '_send-vt send-via))
+    (send '_send-vt send-vt))
   (send 'add-offset-accessor '_vt -1)
 )
 

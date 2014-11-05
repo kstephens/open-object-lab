@@ -26,6 +26,6 @@
             (apply (send self 'proc) self rcvr args)))
         (send 'super
           (lambda (self rcvr . args)
-            (apply send-via rcvr (send (send self 'impl) 'parent) (send self 'op) args)))
+            (apply send rcvr '_send-vt (send (send self 'impl) 'parent) (send self 'op) args)))
         )))
   )
