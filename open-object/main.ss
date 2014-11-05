@@ -114,7 +114,7 @@
   (vtable:add-method 'add-method vtable:add-method)
  
   (send 'add-method 'alloc vtable:alloc)
-  (send 'new-vtable vtable:new-vtable)
+  (send 'add-method 'new-vtable vtable:new-vtable))
  
 ;; Additional vtable methods:
 (to <vtable>
