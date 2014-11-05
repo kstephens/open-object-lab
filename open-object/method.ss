@@ -17,13 +17,13 @@
           (lambda (self proc)
             (send self 'proc= proc)
             self))
-        (send 'apply
-          (lambda (self rcvr vt op args)
-            (apply (send self 'proc) self rcvr args)))
         (send 'method-added-to
           (lambda (self impl op)
             (send self 'impl= impl)
             (send self 'op= op)))
+        (send 'apply
+          (lambda (self rcvr vt op args)
+            (apply (send self 'proc) self rcvr args)))
         (send 'super
           (lambda (self rcvr . args)
             (apply send-via rcvr (send (send self 'impl) 'parent) (send self 'op) args)))
