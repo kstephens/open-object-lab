@@ -40,11 +40,8 @@
     (object:_slot= obj  2 '())
     obj))
 
-(define (vtable:delegated self)
-  (vtable:new-vtable (and self (vtable self)) #f))
- 
-(define <vtable> (vtable:delegated #f))
-(define <object> (vtable:delegated #f))
+(define <vtable> (vtable:new-vtable #f #f))
+(define <object> (vtable:new-vtable #f #f))
  
 (define (vtable:add-method self key value)
   (let* ( (methods (vtable:methods self))
@@ -117,12 +114,11 @@
   (vtable:add-method 'add-method vtable:add-method)
  
   (send 'add-method 'alloc vtable:alloc)
-  (send 'add-method 'delegated vtable:delegated))
+  (send 'new-vtable vtable:new-vtable)
  
 ;; Additional vtable methods:
 (to <vtable>
   (to 'add-method
-    (send 'new-vtable vtable:new-vtable)
     (send 'add-offset-accessor
       (lambda (self name offset)
         (set! offset (+ offset 2))
