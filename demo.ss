@@ -42,18 +42,18 @@
 
   (send <object> 'add-method 'overridden
     (send <method> 'new (lambda (msg self)
-                          (write `(,self as <object>))
+                          (write `(<object> ,self))
                           (newline))))
 
   (send <number> 'add-method 'overridden
     (send <method> 'new (lambda (msg self)
-                          (write `(,self as <number>))
+                          (write `(<number> ,self))
                           (newline)
                           (send msg 'super))))
 
   (send <integer> 'add-method 'overridden
     (send <method> 'new (lambda (msg self)
-                          (write `(,self as <integer>))
+                          (write `(<integer> ,self))
                           (newline)
                           (send msg 'super))))
   (send "foo" 'overridden)
