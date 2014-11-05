@@ -25,18 +25,19 @@ Everything above this level is accomplished by (send rcvr op . args).
 However, there are a few additional low-level provisions for extension:
 
 * (method:apply ...)
-Delegates to (send meth 'apply rcvr vt op args) for methods that are not Scheme procedures.
+Delegates to (send method 'apply rcvr vt op args) for methods that are not Scheme procedures.
 * (vtable:add-method ...)
-Invokes (send meth 'method-added-to vt op) for methods that are not Scheme procedures.
+Invokes (send method 'method-added-to vt op) for methods that are not Scheme procedures.
 * (object:vtable value)
 Returns a vtable given any Scheme value.
 * (object? value)
-Return true if value is a tagged Scheme vector.
+Return true if value is a tagged object vector.
 * (send obj '_slot offset)
+Read slot in tagged object vector.
 * (send obj '_slot= offset value)
-Accessors into tagged Object vectors.
+Write slot in tagged object vector.
 * (send vtable 'name)
-vtable names for debugging purposes.
+vtable name for debugging purposes.
 
 open-object/write.ss
 --------------------
@@ -60,5 +61,5 @@ open-object/method.ss
 Methods that implement super.
 
 Uses protocols:
-* (send 'apply rcvr vt op args)  in (method:apply)
-* (send 'method-added-to method vtable op) in (vtable:add-method)
+* (send method 'apply rcvr vt op args)
+* (send method 'method-added-to vtable op)
