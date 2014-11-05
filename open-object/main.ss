@@ -4,8 +4,7 @@
   (export
     <vtable> <object>
     send send-via
-    set-vtable-proc! object? object:_vt
-    set-send-trace!)
+    set-vtable-proc! object? object:_vt)
   (import
     (rnrs)
     (rnrs mutable-pairs (6))
@@ -14,7 +13,6 @@
 (define (send rcvr op . args)
   (apply send-via rcvr (vtable rcvr) op args))
 (define (send-via rcvr vt op . args)
-  (if *send-trace* (begin (send-w/o-trace `(send-via ,rcvr ,vt ,op . ,args) 'write) (newline)))
   (method:apply (lookup vt op) rcvr vt op args))
 (define (lookup vt op)
   (if (and (eq? op 'lookup) (eq? vt <vtable>))
@@ -76,15 +74,6 @@
 
 (define <vtable> (vtable:new-vtable #f #f))
 (define <object> (vtable:new-vtable #f #f))
-
-(define *send-trace* #f)
-(define (set-send-trace! v) (set! *send-trace* v))
-(define (send-w/o-trace rcvr op . args)
-  (let ((save *send-trace*))
-    (set! *send-trace* #f)
-    (let ((result (apply send rcvr op args)))
-      (set! *send-trace* save)
-      result)))
 
 ;; Bootstrap vtables:
 (begin
