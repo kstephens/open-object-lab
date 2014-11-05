@@ -6,7 +6,8 @@
     <boolean>
     <number> <complex> <real> <rational> <integer>
     <symbol>
-    <sequence> <string> <list> <pair> <null> <vector> <port>)
+    <sequence> <string> <list> <pair> <null> <vector> <port>
+    <applicable> <procedure>)
   (import (open-object) (open-object define-named) (rnrs))
 
 (define-named <scheme>   (send <vtable> 'new-vtable <object>))
@@ -24,6 +25,8 @@
 (define-named <null>     (send <vtable> 'new-vtable <list>))
 (define-named <vector>   (send <vtable> 'new-vtable <sequence>))
 (define-named <port>     (send <vtable> 'new-vtable <sequence>))
+(define-named <applicable> (send <vtable> 'new-vtable <scheme>))
+(define-named <procedure> (send <vtable> 'new-vtable <applicable>))
 
 (begin
 ;; Extend vtable determination into Scheme types:
@@ -42,6 +45,7 @@
     ((number?  self)  <number>)
     ((vector?  self)  <vector>)
     ((port?    self)  <port>)
+    ((procedure? self) <procedure>)
     (else             <scheme>))))
 
   (send <scheme> 'add-method
@@ -76,20 +80,30 @@
                    (display ")" port))))))
 
 (send <sequence> 'add-method
-  'map (lambda (self proc)
+  'map (lambda (self app)
          (let ((acc '()))
            (send self 'for-each
              (lambda (e)
-               (set! acc (cons (proc e) acc))))
+               (set! acc (cons (send app 'apply e) acc))))
            (reverse acc))))
 (send <string> 'add-method
-  'for-each (lambda (self proc)
-          (string-for-each self proc)))
+  'for-each (lambda (self app)
+          (string-for-each
+            (lambda (e) (send app 'apply e)) self)))
 (send <list> 'add-method
-  'for-each (lambda (self proc)
-          (for-each self proc)))
+  'for-each (lambda (self app)
+          (for-each
+            (lambda (e) (send app 'apply e)) self)))
 (send <vector> 'add-method
-  'for-each (lambda (self proc)
-          (vector-for-each self proc)))
+  'for-each (lambda (self app)
+          (vector-for-each
+            (lambda (e) (send app 'apply e)) self)))
+
+(send <procedure> 'add-method
+  'apply (lambda (self rcvr . args)
+    (apply self rcvr args)))
+(send <symbol> 'add-method
+  'apply (lambda (self rcvr . args)
+    (apply send rcvr self args)))
 
 ))

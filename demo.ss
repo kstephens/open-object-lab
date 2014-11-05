@@ -68,3 +68,11 @@
   (send 2.34  'overridden) (newline)
   )
 (method-demo)
+
+(define (apply-demo)
+  (display "\n  :: apply-demo ::\n")
+  (write (send '(1 2 3) 'map (lambda (x) (* x x)))) (newline)
+  (send <number> 'add-method 'add1 (lambda (self) (+ self 1)))
+  (write (send '(1 2 3) 'map 'add1)) (newline)
+  )
+(apply-demo)
