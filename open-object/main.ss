@@ -25,7 +25,6 @@
     ((procedure? self)
       (apply self rcvr args))
     ((not self)
-      (send `(method:apply: ERROR: cannot find method for ,op in ,vt) 'write) (newline)
       (error "method:apply" `(cannot find method for ,op in ,vt)))
     (else
       (send self 'apply rcvr vt op args))))
