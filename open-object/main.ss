@@ -143,17 +143,18 @@
     (send 'name 0)
     (send 'parent 1)
     (send 'methods 2))
-  (send 'name= 'vtable)
+  (send 'name= '<vtable>)
 )
 
 ;; Additional object methods:
 (to <object>
-  (send 'name= 'object)
+  (send 'name= '<object>)
   (to 'add-method
     (send '_slot  object:_slot)
     (send '_slot= object:_slot=)
     (send '_vtable vtable)
-    (send '_send send))
+    (send '_send send)
+    (send '_send_vt send-via))
   (send 'add-offset-accessor '_vt -1)
 )
 
