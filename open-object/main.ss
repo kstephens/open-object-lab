@@ -26,14 +26,6 @@
   (if (and (eq? op 'lookup) (eq? vt <vtable>))
     (vtable:lookup vt op)
     (send vt 'lookup op)))
-(define (method:apply self rcvr vt op args)
-  (cond
-    ((procedure? self)
-      (apply self rcvr args))
-    ((not self)
-      (error "method:apply" `(cannot find method for ,op in ,vt)))
-    (else
-      (send self 'apply rcvr vt op args))))
 
 (define (object? self)
   (and (vector? self)
