@@ -19,7 +19,7 @@
     (cond
       ((procedure? meth) meth)
       ((not meth)
-        (error "bind" `(no method for ,op in ,vt)))
+        (error "bind" `(no method for ,op in ,(vtable:describe vt))))
       (else
         (send meth 'bind rcvr vt op)))))
 (define (lookup vt op)
@@ -74,6 +74,14 @@
 
 (define <vtable> (vtable:new-vtable #f #f))
 (define <object> (vtable:new-vtable #f #f))
+
+(define (vtable:describe self)
+  (and self
+  `(<vtable>
+     :name    ,(object:_slot self 0)
+     :_vt     ,(object:_slot (object:_vt self) 0)
+     :methods ,(map car (object:_slot self 2))
+     :parent  ,(vtable:describe (object:_slot self 1)))))
 
 ;; Bootstrap vtables:
 (begin
