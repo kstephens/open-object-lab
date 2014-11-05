@@ -39,11 +39,8 @@
     (object:_slot= obj  2 '())
     obj))
 
-(define (vtable:with-parent-size self parent size)
-  (vtable:new-vtable (and self (vtable self)) parent size))
-
 (define (vtable:with-parent self parent)
-  (vtable:with-parent-size self parent 3))
+  (vtable:new-vtable (and self (vtable self)) parent 3))
 
 (define (vtable:delegated self)
   (vtable:with-parent self #f))
@@ -129,7 +126,6 @@
   (to 'add-method
     (send 'new-vtable vtable:new-vtable)
     (send 'with-parent vtable:with-parent)
-    (send 'with-parent-size vtable:with-parent-size)
     (send 'add-offset-accessor
       (lambda (self name offset)
         (set! offset (+ offset 2))
