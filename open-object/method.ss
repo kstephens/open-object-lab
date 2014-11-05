@@ -6,11 +6,12 @@
     (rnrs)
     (open-object)
     (open-object to)
+    (open-object define-named)
     (open-object scheme-types)
     (open-object slotted))
 
-  (define <method>
-    (to (send slotted 'new-class 'method <slotted-object> '(proc op impl))
+  (define-named <method>
+    (to (send slotted 'new-class <slotted-object> '(proc op impl))
       (to 'add-method
         (send 'initialize
           (lambda (self proc)

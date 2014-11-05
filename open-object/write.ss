@@ -18,15 +18,10 @@
              ))
   (send <vtable> 'add-method
     'write-to (lambda (self port)
-             (display "#<vtable " port)
+             (display "#<" port)
+             (send (send (send self '_vtable) 'name) 'write-to port)
+             (display " " port)
              (send (send self 'name) 'write-to port)
-             (if (and #f (not (eq? <vtable> self)))
-               (begin
-                 (display "\n  _vt: " port)
-                 (send (send self '_vt) 'write-to port)
-                 (display "\n  parent: " port)
-                 (send (send self 'parent) 'write-to port)
-                 ))
              (display ">" port)
              ))
   ))

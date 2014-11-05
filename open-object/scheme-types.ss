@@ -7,30 +7,25 @@
     <number> <complex> <real> <rational> <integer>
     <symbol>
     <sequence> <string> <list> <pair> <null> <vector> <port>)
-  (import (open-object) (rnrs))
+  (import (open-object) (open-object define-named) (rnrs))
 
-(define <scheme>   (send <vtable> 'new-vtable <object>))
-(define <boolean>  (send <vtable> 'new-vtable <scheme>))
-(define <number>   (send <vtable> 'new-vtable <scheme>))
-(define <complex>  (send <vtable> 'new-vtable <number>))
-(define <real>     (send <vtable> 'new-vtable <complex>))
-(define <rational> (send <vtable> 'new-vtable <real>))
-(define <integer>  (send <vtable> 'new-vtable <rational>))
-(define <symbol>   (send <vtable> 'new-vtable <scheme>))
-(define <sequence> (send <vtable> 'new-vtable <scheme>))
-(define <string>   (send <vtable> 'new-vtable <sequence>))
-(define <list>     (send <vtable> 'new-vtable <sequence>))
-(define <pair>     (send <vtable> 'new-vtable <list>))
-(define <null>     (send <vtable> 'new-vtable <list>))
-(define <vector>   (send <vtable> 'new-vtable <sequence>))
-(define <port>     (send <vtable> 'new-vtable <sequence>))
+(define-named <scheme>   (send <vtable> 'new-vtable <object>))
+(define-named <boolean>  (send <vtable> 'new-vtable <scheme>))
+(define-named <number>   (send <vtable> 'new-vtable <scheme>))
+(define-named <complex>  (send <vtable> 'new-vtable <number>))
+(define-named <real>     (send <vtable> 'new-vtable <complex>))
+(define-named <rational> (send <vtable> 'new-vtable <real>))
+(define-named <integer>  (send <vtable> 'new-vtable <rational>))
+(define-named <symbol>   (send <vtable> 'new-vtable <scheme>))
+(define-named <sequence> (send <vtable> 'new-vtable <scheme>))
+(define-named <string>   (send <vtable> 'new-vtable <sequence>))
+(define-named <list>     (send <vtable> 'new-vtable <sequence>))
+(define-named <pair>     (send <vtable> 'new-vtable <list>))
+(define-named <null>     (send <vtable> 'new-vtable <list>))
+(define-named <vector>   (send <vtable> 'new-vtable <sequence>))
+(define-named <port>     (send <vtable> 'new-vtable <sequence>))
 
 (begin
-  (send <scheme> 'name= 'scheme)
-  (send <number> 'name= 'number)
-  (send <complex> 'name= 'complex)
-  (send <real> 'name= 'real)
-
 ;; Extend vtable determination into Scheme types:
 (set-vtable-proc! (lambda (self)
   (cond

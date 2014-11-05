@@ -8,19 +8,16 @@
   (import
     (open-object)
     (open-object to)
+    (open-object define-named)
     (rnrs))
 
-  (define <slotted-class-class>  (send <vtable>              'new-vtable <vtable>              8))
-  (define <slotted-class>        (send <slotted-class-class> 'new-vtable <slotted-class-class> 8))
-  (define <slotted-object-class> (send <slotted-class-class> 'new-vtable <vtable>              8))
-  (define <slotted-object>       (send <slotted-class>       'new-vtable <object>              8))
-  (define slotted                (send <slotted-class-class> 'alloc 0))
+  (define-named <slotted-class-class>  (send <vtable>              'new-vtable <vtable>              8))
+  (define-named <slotted-class>        (send <slotted-class-class> 'new-vtable <slotted-class-class> 8))
+  (define-named <slotted-object-class> (send <slotted-class-class> 'new-vtable <vtable>              8))
+  (define-named <slotted-object>       (send <slotted-class>       'new-vtable <object>              8))
+  (define-named slotted                (send <slotted-class-class> 'alloc 8))
 
   (begin
-    (send <slotted-class-class> 'name= 'slotted-class-class)
-    (send <slotted-class>  'name= 'slotted-class)
-    (send <slotted-object> 'name= 'slotted-object)
-
     (to <slotted-class-class>
       (to 'add-offset-accessor
         (send 'slots 3)
@@ -34,16 +31,15 @@
 
     (send <slotted-class-class> 'add-method
       'new-class
-      (lambda (self name parent slots)
+      (lambda (self parent slots)
         (let ((cls (send <slotted-class> 'alloc 8)))
-          (send cls 'initialize name parent slots))))
+          (send cls 'initialize parent slots))))
 
     (send <slotted-class> 'add-method
       'initialize
-      (lambda (self name parent slots)
+      (lambda (self parent slots)
         (send self 'parent= parent)
         (send self 'methods= '())
-        (send self 'name= name)
         (send self 'slots= slots)
 
         (let ( (i (if parent (send parent 'slots-size) 0))

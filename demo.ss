@@ -16,6 +16,7 @@
   (send 1234.56 'write) (newline)
   (send 1/23 'write) (newline)
   (send '(a cons) 'write) (newline)
+  (send <slotted-class> 'write) (newline)
   )
 (write-demo)
 
@@ -23,7 +24,7 @@
   (display "\n  :: slotted-demo ::\n")
   (let ((cls #f) (obj #f))
   ; (set-send-trace! #t)
-    (set! cls (send slotted 'new-class 'cls <slotted-object> '(a b c)))
+    (set! cls (send slotted 'new-class <slotted-object> '(a b c)))
     (send cls 'add-method 'initialize
       (lambda (self b)
         (send self 'b= b)
