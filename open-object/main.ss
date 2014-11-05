@@ -33,18 +33,17 @@
 (define (vtable:methods  self)   (object:_slot  self 2))
 (define (vtable:methods= self v) (object:_slot= self 2 v))
 
-(define (vtable:new-vtable self size vtable parent)
+(define (vtable:new-vtable self parent size)
   (let ((obj (vtable:alloc self size)))
-    (object:_slot= obj -1 vtable)
     (object:_slot= obj  1 parent)
     (object:_slot= obj  2 '())
     obj))
 
 (define (vtable:with-parent-size self parent size)
-  (vtable:new-vtable self size (and self (vtable self)) parent))
+  (vtable:new-vtable (and self (vtable self)) parent size))
 
 (define (vtable:with-parent self parent)
-  (vtable:with-parent-size self parent 4))
+  (vtable:with-parent-size self parent 3))
 
 (define (vtable:delegated self)
   (vtable:with-parent self #f))

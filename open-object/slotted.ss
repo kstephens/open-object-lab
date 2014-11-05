@@ -10,10 +10,10 @@
     (open-object to)
     (rnrs))
 
-  (define <slotted-class-class>  (send <vtable> 'new-vtable 8 <vtable> <vtable>))
-  (define <slotted-class>        (send <vtable> 'new-vtable 8 <slotted-class-class> <slotted-class-class>))
-  (define <slotted-object-class> (send <vtable> 'new-vtable 8 <vtable> <slotted-class-class>))
-  (define <slotted-object>       (send <vtable> 'new-vtable 8 <slotted-class> <object>))
+  (define <slotted-class-class>  (send <vtable>              'new-vtable <vtable>              8))
+  (define <slotted-class>        (send <slotted-class-class> 'new-vtable <slotted-class-class> 8))
+  (define <slotted-object-class> (send <slotted-class-class> 'new-vtable <vtable>              8))
+  (define <slotted-object>       (send <slotted-class>       'new-vtable <object>              8))
   (define slotted                (send <slotted-class-class> 'alloc 0))
 
   (begin
