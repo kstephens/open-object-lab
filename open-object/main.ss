@@ -11,9 +11,17 @@
     (open-object to))
 
 (define (send rcvr op . args)
-  (apply send-vt rcvr (vtable rcvr) op args))
+  (apply (bind rcvr (vtable rcvr) op) rcvr args))
 (define (send-vt rcvr vt op . args)
-  (method:apply (lookup vt op) rcvr vt op args))
+  (apply (bind rcvr vt op) rcvr args))
+(define (bind rcvr vt op)
+  (let ((meth (lookup vt op)))
+    (cond
+      ((procedure? meth) meth)
+      ((not meth)
+        (error "bind" `(no method for ,op in ,vt)))
+      (else
+        (send meth 'bind rcvr vt op)))))
 (define (lookup vt op)
   (if (and (eq? op 'lookup) (eq? vt <vtable>))
     (vtable:lookup vt op)

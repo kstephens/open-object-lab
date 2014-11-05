@@ -19,13 +19,20 @@ Overview
 open-object/main.ss
 -------------------
 
-The basic object model as described in the paper.
+The basic object model and semantics as described in the paper.
 Objects at this level are tagged Scheme vectors.
 Everything above this level is accomplished by (send rcvr op . args).
-However, there are a few additional low-level provisions for extension:
 
-* (method:apply ...)
-Delegates to (send method 'apply rcvr vt op args) for methods that are not Scheme procedures.
+Send is defined as:
+
+    (define (send rcvr op . args)
+      (apply (bind rcvr (vtable rcvr)) rcvr args))
+
+There are a few additional low-level provisions for extension:
+
+* (bind rcvr vt op)
+Delegates to (send method 'bind rcvr vt op) for methods that are not
+Scheme procedures to produce a bound procedure.
 * (vtable:add-method ...)
 Invokes (send method 'method-added-to vt op) for methods that are not Scheme procedures.
 * (object:vtable value)
@@ -59,7 +66,9 @@ open-object/method.ss
 ---------------------
 
 Methods that implement super.
+Reifies the message being sent using the context of the vtable implementing
+the method.
 
 Uses protocols:
-* (send method 'apply rcvr vt op args)
-* (send method 'method-added-to vtable op)
+* (send method 'bind rcvr vt op)
+* (send method 'method-added-to vt op)
