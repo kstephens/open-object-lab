@@ -33,17 +33,15 @@
 (define (vtable:methods  self)   (object:_slot  self 2))
 (define (vtable:methods= self v) (object:_slot= self 2 v))
 
-(define (vtable:new-vtable self parent size)
-  (let ((obj (vtable:alloc self size)))
+(define (vtable:new-vtable self parent . opts)
+  (let* ((size (and (pair? opts) (car opts)))
+         (obj (vtable:alloc self (or size 3))))
     (object:_slot= obj  1 parent)
     (object:_slot= obj  2 '())
     obj))
 
-(define (vtable:with-parent self parent)
-  (vtable:new-vtable (and self (vtable self)) parent 3))
-
 (define (vtable:delegated self)
-  (vtable:with-parent self #f))
+  (vtable:new-vtable (and self (vtable self)) #f))
  
 (define <vtable> (vtable:delegated #f))
 (define <object> (vtable:delegated #f))
@@ -125,7 +123,6 @@
 (to <vtable>
   (to 'add-method
     (send 'new-vtable vtable:new-vtable)
-    (send 'with-parent vtable:with-parent)
     (send 'add-offset-accessor
       (lambda (self name offset)
         (set! offset (+ offset 2))
